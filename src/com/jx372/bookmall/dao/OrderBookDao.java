@@ -11,7 +11,8 @@ import java.util.List;
 
 import com.jx372.bookmall.vo.BookVo;
 
-public class CartDao {
+public class OrderBookDao {
+	
 	
 	private Connection getConnection() throws SQLException {
 
@@ -52,13 +53,13 @@ public class CartDao {
 
 			// 3. statement 준비
 
-			String sql = "insert into cart values( ?,?,?)";
+			String sql = "insert into orderbook values( ?,?,?)";
 
 			pstmt = conn.prepareStatement(sql);
 
 			// 4. 바인딩
 	
-			pstmt.setInt(1, BookVo.getMem_id());
+			pstmt.setInt(1, BookVo.getOrder_id());
 			pstmt.setInt(2, BookVo.getBook_id());
 			pstmt.setInt(3, BookVo.getNum());
 		
@@ -117,7 +118,7 @@ public class CartDao {
 
 			// 4. sql문 실행 ; 콜론 붙이지 않기
 
-			String sql = "select m.mem_id, m.mem_name, b.book_name, c.num, c.num*b.price  from cart c, book b, member m where c.mem_id=m.mem_id and c.book_id=b.book_id";
+			String sql = "select ob.book_id, b.book_name, ob.num from orderbook ob,book b where ob.book_id=b.book_id";
 			rs = stmt.executeQuery(sql); // select 는executeQuery, insert ,
 											// updete 는 excuteupdate
 
@@ -125,18 +126,16 @@ public class CartDao {
 
 			while (rs.next()) {
 
-				int mem_id = rs.getInt(1);
-				String mem_name = rs.getString(2);
-				String book_name=rs.getString(3);
-				int num=rs.getInt(4);
-				int sum=rs.getInt(5);
+				int book_id = rs.getInt(1);
+				String book_name = rs.getString(2);
+				int num=rs.getInt(3);
+
 
 				BookVo BookVo = new BookVo();
-				BookVo.setMem_id(mem_id);
-				BookVo.setMem_name(mem_name);
+				BookVo.setBook_id(book_id);
 				BookVo.setBook_name(book_name);
 				BookVo.setNum(num);
-				BookVo.setSum(sum);
+		
 				
 			
 
@@ -191,7 +190,7 @@ public class CartDao {
 
 			// 4. sql문 실행 ; 콜론 붙이지 않기
 
-			String sql = "select m.mem_id, m.mem_name, b.book_name, c.num, c.num*b.price  from cart c, book b, member m where c.mem_id=m.mem_id and c.book_id=b.book_id and m.mem_id=? and b.book_id=?";
+			String sql = "select ob.order_id, ob.book_id, b.book_name, ob.num from orderbook ob,book b where ob.book_id=b.book_Id and ob.order_id=? and ob.book_id=? ";
 			pstmt = conn.prepareStatement(sql);// select 는executeQuery, insert ,
 												// updete 는 excuteupdate
 
@@ -204,11 +203,11 @@ public class CartDao {
 			while (rs.next()) {
 			
 				BookVo=new BookVo();
-				BookVo.setMem_id(rs.getInt(1));
-				BookVo.setMem_name(rs.getString(2));
+				BookVo.setOrder_id(rs.getInt(1));
+				BookVo.setBook_id(rs.getInt(2));
 				BookVo.setBook_name(rs.getString(3));
 				BookVo.setNum(rs.getInt(4));
-				BookVo.setSum(rs.getInt(5));
+		
 				
 				
 			}
@@ -261,7 +260,7 @@ public class CartDao {
 
 			// 3. statement 생성(확장성 용이)
 
-			String sql = "delete from cart where mem_id=? and book_id=?";
+			String sql = "delete from orderbook where order_id=? and book_id=?";
 			pstmt = conn.prepareStatement(sql);// select 는executeQuery, insert ,
 												// updete 는 excuteupdate
 
@@ -319,13 +318,13 @@ public class CartDao {
 
 			// 4. sql문 실행 ; 콜론 붙이지 않기
 
-			String sql = "update cart set num=? where book_id=? and mem_id=?";
+			String sql = "update orderbook set num=? where order_id=? and book_id=?";
 			pstmt = conn.prepareStatement(sql);// select 는executeQuery, insert ,
 												// updete 는 excuteupdate
 
 			pstmt.setInt(1, BookVo.getNum());
-			pstmt.setInt(2, BookVo.getBook_id());
-			pstmt.setInt(3, BookVo.getMem_id());
+			pstmt.setInt(2, BookVo.getOrder_id());
+			pstmt.setInt(3, BookVo.getBook_id());
 			
 	
 			// 5. fetch row를 하나씩 가져오기
@@ -369,5 +368,6 @@ public class CartDao {
 		}
 
 	}
+
 
 }
